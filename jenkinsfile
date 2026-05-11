@@ -1,0 +1,105 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+        EKS_CLUSTER_NAME   = 'my-eks-project-dev-cluster'
+
+        DOCKERHUB_USERNAME = 'reemhisham32'
+        IMAGE_NAME         = 'smart-inventory-app'
+        IMAGE_TAG          = "${BUILD_NUMBER}"
+        IMAGE_URI          = "${DOCKERHUB_USERNAME}/${IMAGE_NAME}"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo "Checking out application code..."
+                checkout scm
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                echo "Logging in to Docker Hub..."
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image..."
+                sh '''
+                docker build -t $IMAGE_URI:$IMAGE_TAG .
+                docker tag $IMAGE_URI:$IMAGE_TAG $IMAGE_URI:latest
+                '''
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                echo "Pushing Docker image to Docker Hub..."
+                sh '''
+                docker push $IMAGE_URI:$IMAGE_TAG
+                docker push $IMAGE_URI:latest
+                '''
+            }
+        }
+
+        stage('Update Kubeconfig') {
+            steps {
+                echo "Connecting Jenkins to EKS..."
+                sh '''
+                aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $EKS_CLUSTER_NAME
+                '''
+            }
+        }
+
+        stage('Deploy to EKS') {
+            steps {
+                echo "Deploying application to EKS..."
+                sh '''
+                kubectl apply -f k8s/deployment.yaml
+                kubectl apply -f k8s/service.yaml
+
+                kubectl set image deployment/smart-inventory-app \
+                  smart-inventory-app=$IMAGE_URI:$IMAGE_TAG
+
+                kubectl rollout status deployment/smart-inventory-app
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                echo "Checking Kubernetes resources..."
+                sh '''
+                kubectl get pods
+                kubectl get svc smart-inventory-service
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Application deployed successfully to EKS using Docker Hub."
+        }
+
+        failure {
+            echo "Application deployment failed. Check Jenkins logs."
+        }
+
+        always {
+            sh 'docker logout || true'
+        }
+    }
+}

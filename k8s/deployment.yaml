@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-inventory-app
+  labels:
+    app: smart-inventory-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: smart-inventory-app
+  template:
+    metadata:
+      labels:
+        app: smart-inventory-app
+    spec:
+      containers:
+        - name: smart-inventory-app
+          image: reemhisham32/smart-inventory-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 20
