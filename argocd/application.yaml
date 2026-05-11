@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: smart-inventory-app
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: smart-inventory-app=reemhisham32/smart-inventory-app
+    argocd-image-updater.argoproj.io/smart-inventory-app.update-strategy: newest-build
+    argocd-image-updater.argoproj.io/write-back-method: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/reemhisham32/smart-inventory-devopss-project-DEPI.git
+    targetRevision: master
+    path: k8s
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
