@@ -1,8 +1,7 @@
+inventory.db
+instance/
 __pycache__/
 *.pyc
 .env
-.venv/
 venv/
-instance/
-*.db
-.DS_Store
+.venv/
