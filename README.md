@@ -2,6 +2,11 @@
 <img width="1600" height="765" alt="WhatsApp Image 2026-05-12 at 1 26 10 PM" src="https://github.com/user-attachments/assets/340e9120-4970-4121-b404-cdeddaf2199c" />
 
 
+<img width="1600" height="761" alt="WhatsApp Image 2026-05-12 at 1 26 41 PM" src="https://github.com/user-attachments/assets/06a7c448-12b9-4b72-b61c-ffbac03f3429" />
+<img width="1600" height="764" alt="WhatsApp Image 2026-05-12 at 1 27 25 PM" src="https://github.com/user-attachments/assets/43b9552b-bdc3-4ef9-b427-c328a926f088" />
+
+
+
 A full-stack inventory management web application built with **Flask** and deployed on **AWS EKS** using a complete CI/CD pipeline powered by **Jenkins**, **Docker**, and **ArgoCD**.
 
 ---
