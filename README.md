@@ -1,4 +1,6 @@
 # 📦 Smart Inventory App — DevOps Project (DEPI)
+<img width="1600" height="765" alt="WhatsApp Image 2026-05-12 at 1 26 10 PM" src="https://github.com/user-attachments/assets/340e9120-4970-4121-b404-cdeddaf2199c" />
+
 
 A full-stack inventory management web application built with **Flask** and deployed on **AWS EKS** using a complete CI/CD pipeline powered by **Jenkins**, **Docker**, and **ArgoCD**.
 
